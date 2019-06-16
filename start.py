@@ -5,9 +5,28 @@ from bs4 import BeautifulSoup
 import base64, re, os
 
 class browser_emulator():
-    def __init__(self, url):
+    def __init__(self, url, driver):
         self.url = url
+        self.driver = driver
         self.emulator()
+
+    def emulator(self):
+        print("Работаем с URL "+self.url)
+        driver = self.driver
+        driver.get(self.url)
+        button = driver.find_element_by_class_name("item-phone-button-sub-text")
+        button.click()
+        time.sleep(1)
+        soup = BeautifulSoup(driver.page_source, "lxml")
+        true_img = ""
+        for img in soup.find_all("img"):
+            if "data:image/png" in str(img):
+                true_img = str(img)
+        if true_img != "":
+            self.img_data = true_img
+            self.imgurl2text()
+        else:
+            print("Ничего не найдено 😥")
 
     def imgurl2text(self):
 
@@ -23,52 +42,30 @@ class browser_emulator():
         print(phone_number)
         os.remove(file_name)
 
-    def emulator(self):
-
-        driver = webdriver.Firefox()
-        driver.get(self.url)
-        button = driver.find_element_by_class_name("item-phone-button-sub-text")
-        button.click()
-        soup = BeautifulSoup(driver.page_source, "lxml")
-        true_img = ""
-        for img in soup.find_all('img'):
-            if "data:image/png" in str(img):
-                true_img = str(img)
-        if true_img != "":
-            self.img_data = true_img
-            self.imgurl2text()
-        else:
-            print("Ничего не найдено 😥")
-
-        
-
-        #item-extended-phone
-
-
-class avito_parser():
+class parse_links_class():
     def __init__(self):
-        self.base_url = "https://www.avito.ru/moskva"
-        self.main_method()
-        
-    def main_method(self):
-        session = requests.session()
-        session.headers.update({"User-Agent": "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0"})
+        self.base_url = "https://www.avito.ru"
+        self.avito_parse()
+
+    def avito_parse(self):
         page_counter = 1
+        driver = webdriver.Chrome()
 
         while page_counter != 8:
-            dynamic_url = "/lichnye_veschi?s_trg=10&p=" + str(page_counter)
-            htmltext = session.get(self.base_url + dynamic_url).text
-            soup = BeautifulSoup(htmltext, "lxml")
-            idlinks_list = []
+            dynamic_url = "/moskva/lichnye_veschi?s_trg=10&p=" + str(page_counter)
+            driver.get(self.base_url + dynamic_url)
+            soup = BeautifulSoup(driver.page_source, "lxml")
+            for link in soup.findAll('a', attrs={'href': re.compile("^/moskva/")}):
+                if "js-item-slider item-slider" in str(link):
+                    link_str = str(link)
+                    new_link = link_str[link_str.find("<a class=\"js-item-slider item-slider\" href=\"") + len("<a class=\"js-item-slider item-slider\" href=\""):link_str.rfind("\"> <ul class=\"item-slider-list js-item-slider-list\">")]
+                    browser_emulator(self.base_url + new_link, driver)
+                        #print("Found the URL:", a['href'])
+                    #print(link)
+            #item-description-title-link
 
-            
-
-            idlinks_list = list(set(idlinks_list))
-
-            print("**Получили данные со страницы " + str(dynamic_url) + "**")
             page_counter += 1
-            time.sleep(3)
 
-#avito_parser()
-
-browser_emulator("https://www.avito.ru/moskva/odezhda_obuv_aksessuary/steganaya_kurtka_barbour_chelsea_1526067487")
+parse_links_class()
+#driver = webdriver.Chrome()
+#browser_emulator("https://www.avito.ru/moskva/odezhda_obuv_aksessuary/nike_1015483227", driver)
