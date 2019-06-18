@@ -3,6 +3,7 @@ import pytesseract
 from selenium import webdriver
 from bs4 import BeautifulSoup
 import base64, re, os
+from PIL import Image
 
 class browser_emulator():
     def __init__(self, url, driver):
@@ -37,10 +38,14 @@ class browser_emulator():
         file_name = "image." + file_ext
         with open(file_name, 'wb') as f:
             f.write(plain_data)
-        phone_number = pytesseract.image_to_string(file_name)
+        im = Image.open(file_name)
+        im = im.convert("RGB")
+        im.save("image.jpg")
+        phone_number = pytesseract.image_to_string("image.jpg")
         phone_number = re.sub('[-" "]', '', phone_number)
         print(phone_number)
         os.remove(file_name)
+        os.remove("image.jpg")
 
 class parse_links_class():
     def __init__(self):
