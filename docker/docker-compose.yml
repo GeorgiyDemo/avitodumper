@@ -1,0 +1,6 @@
+version: '3'
+services:
+  worker:
+    build: docker/.
+    volumes:
+      - ./shared:/root/shared/

@@ -1,4 +1,5 @@
 import requests, time
+import writer_module
 import pytesseract
 from selenium import webdriver
 from bs4 import BeautifulSoup
@@ -42,7 +43,8 @@ class browser_emulator():
         im = im.convert("RGB")
         im.save("image.jpg")
         phone_number = pytesseract.image_to_string("image.jpg")
-        phone_number = re.sub('[-" "]', '', phone_number)
+        phone_number = re.sub('[\-" "]', '', phone_number)
+        writer_module.writer_class(phone_number)
         print(phone_number)
         os.remove(file_name)
         os.remove("image.jpg")
@@ -53,7 +55,7 @@ class parse_links_class():
         self.avito_parse()
 
     def avito_parse(self):
-        page_counter = 1
+        page_counter = 7
         driver = webdriver.Chrome()
 
         while page_counter != 8:
@@ -65,9 +67,6 @@ class parse_links_class():
                     link_str = str(link)
                     new_link = link_str[link_str.find("<a class=\"js-item-slider item-slider\" href=\"") + len("<a class=\"js-item-slider item-slider\" href=\""):link_str.rfind("\"> <ul class=\"item-slider-list js-item-slider-list\">")]
                     browser_emulator(self.base_url + new_link, driver)
-                        #print("Found the URL:", a['href'])
-                    #print(link)
-            #item-description-title-link
 
             page_counter += 1
 

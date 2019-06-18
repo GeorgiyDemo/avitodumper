@@ -28,8 +28,8 @@ RUN \
   apt-get update && \
   apt-get install -y python3 python3-pip python3-dev
 RUN apt-get install tesseract-ocr libsm6 libxext6 -y
-ADD . /code
-WORKDIR /code
+WORKDIR /root/
+ADD . /root/
 
 RUN mv rus.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 RUN pip3 install -r requirements.txt

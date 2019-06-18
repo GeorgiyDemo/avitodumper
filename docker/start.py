@@ -1,3 +1,6 @@
+#Кол-во номеров
+#Ссылка
+#Подссылка
 import requests, time
 import pytesseract
 from selenium import webdriver
@@ -54,7 +57,9 @@ class parse_links_class():
         self.avito_parse()
 
     def avito_parse(self):
-        page_counter = 1
+        ##############################################
+        page_counter = 7
+        ##############################################
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--window-size=1420,1080')
@@ -71,10 +76,6 @@ class parse_links_class():
                     link_str = str(link)
                     new_link = link_str[link_str.find("<a class=\"js-item-slider item-slider\" href=\"") + len("<a class=\"js-item-slider item-slider\" href=\""):link_str.rfind("\"> <ul class=\"item-slider-list js-item-slider-list\">")]
                     browser_emulator(self.base_url + new_link, driver)
-                        #print("Found the URL:", a['href'])
-                    #print(link)
-            #item-description-title-link
-
             page_counter += 1
 
 parse_links_class()
