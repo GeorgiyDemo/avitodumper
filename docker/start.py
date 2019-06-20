@@ -8,7 +8,10 @@ from bs4 import BeautifulSoup
 import base64, re, os
 from PIL import Image
 
-class browser_emulator():
+class advertisement_parser():
+    """
+    Класс для парсинга каждой отдельной страницы
+    """
     def __init__(self, url, driver):
         self.url = url
         self.driver = driver
@@ -22,6 +25,12 @@ class browser_emulator():
         button.click()
         time.sleep(1)
         soup = BeautifulSoup(driver.page_source, "lxml")
+        
+        #TODO необходимо получить тут следующую информацию:
+        #номер - есть
+        #Имя человека
+        # Тип объявления (частное или компания)
+        # URL страницы - есть
         true_img = ""
         for img in soup.find_all("img"):
             if "data:image/png" in str(img):
@@ -51,15 +60,15 @@ class browser_emulator():
         os.remove("image.jpg")
 
 class parse_links_class():
+    """
+    Класс для сбора ссылок с объявлениями
+    """
     def __init__(self):
-        print("Запустили скрипт..")
         self.base_url = "https://www.avito.ru"
-        self.avito_parse()
+        self.pages_parser()
 
-    def avito_parse(self):
-        ##############################################
+    def pages_parser(self):
         page_counter = 7
-        ##############################################
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--no-sandbox')
         chrome_options.add_argument('--window-size=1420,1080')
@@ -75,7 +84,7 @@ class parse_links_class():
                 if "js-item-slider item-slider" in str(link):
                     link_str = str(link)
                     new_link = link_str[link_str.find("<a class=\"js-item-slider item-slider\" href=\"") + len("<a class=\"js-item-slider item-slider\" href=\""):link_str.rfind("\"> <ul class=\"item-slider-list js-item-slider-list\">")]
-                    browser_emulator(self.base_url + new_link, driver)
+                    advertisement_parser(self.base_url + new_link, driver)
             page_counter += 1
 
 parse_links_class()

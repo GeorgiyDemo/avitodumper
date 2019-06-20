@@ -2,5 +2,7 @@ version: '3'
 services:
   worker:
     build: docker/.
+  db:
+    image: mysql:8.0.15
     volumes:
-      - ./shared:/root/shared/
+      - "./dbdata/db:/var/lib/mysql"
