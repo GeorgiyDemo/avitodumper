@@ -31,7 +31,7 @@ RUN apt-get install tesseract-ocr libsm6 libxext6 -y
 WORKDIR /root/
 ADD . /root/
 
-RUN mv rus.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
+RUN mv eng.traineddata /usr/share/tesseract-ocr/4.00/tessdata/
 RUN pip3 install -r requirements.txt
 
 CMD python3 start.py
