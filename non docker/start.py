@@ -1,3 +1,8 @@
+#Кол-во номеров
+#Ссылка
+#Подссылка
+#Длинна номера для фильтрации
+
 import requests, time
 import writer_module
 import pytesseract
@@ -16,17 +21,44 @@ class browser_emulator():
         print("Работаем с URL "+self.url)
         driver = self.driver
         driver.get(self.url)
-        button = driver.find_element_by_class_name("item-phone-button-sub-text")
-        button.click()
-        time.sleep(1)
-        soup = BeautifulSoup(driver.page_source, "lxml")
+        try:
+            button = driver.find_element_by_class_name("item-phone-button-sub-text")
+            button.click()
+            time.sleep(1)
+            soup = BeautifulSoup(driver.page_source, "lxml")
+        except:
+            print("ЛОЛ, КНОПКИ С НОМЕРОМ ТЕЛЕФОНА НЕТ НА СТРАНИЦЕ")
+
+#TODO TRY CATCH 
+        #Поиск имени
+        for data in soup.find_all('div',{'class':'seller-info-name js-seller-info-name'}):
+            username = data.getText()
+        username = re.sub('[" "\n]', '', username)
+        print(username)
+
+#TODO TRY CATCH 
+        #Тип пользоватля (компания/частное лицо/арендодатель и т.д.)
+        for data in soup.find_all('div',{'class':'seller-info-col'}):
+            buf_usertype = data.getText()
+        buf_usertype_list = buf_usertype.split("\n")
+        buf_usertype_list = list(filter(None, buf_usertype_list))
+        usertype = buf_usertype_list[len(buf_usertype_list)-2]
+        print(usertype)
+
+        #Определение текста на изображении
         true_img = ""
+        self.number_result = False
         for img in soup.find_all("img"):
             if "data:image/png" in str(img):
                 true_img = str(img)
         if true_img != "":
             self.img_data = true_img
             self.imgurl2text()
+            if self.number_result != False:
+                #TODO Запись данных куда там надо
+                print(self.number_result)
+                writer_module.writer_class(self.number_result)
+
         else:
             print("Ничего не найдено 😥")
 
@@ -44,8 +76,10 @@ class browser_emulator():
         im.save("image.jpg")
         phone_number = pytesseract.image_to_string("image.jpg")
         phone_number = re.sub('[\-" "]', '', phone_number)
-        writer_module.writer_class(phone_number)
-        print(phone_number)
+        if len(phone_number) == 11:
+            self.number_result = phone_number
+        else:
+            print("Ойй, номер какой-то странный")
         os.remove(file_name)
         os.remove("image.jpg")
 
@@ -55,10 +89,10 @@ class parse_links_class():
         self.avito_parse()
 
     def avito_parse(self):
-        page_counter = 7
+        page_counter = 1
         driver = webdriver.Chrome()
 
-        while page_counter != 8:
+        while page_counter != 5:
             dynamic_url = "/moskva/lichnye_veschi?s_trg=10&p=" + str(page_counter)
             driver.get(self.base_url + dynamic_url)
             soup = BeautifulSoup(driver.page_source, "lxml")
@@ -71,5 +105,3 @@ class parse_links_class():
             page_counter += 1
 
 parse_links_class()
-#driver = webdriver.Chrome()
-#browser_emulator("https://www.avito.ru/moskva/odezhda_obuv_aksessuary/nike_1015483227", driver)

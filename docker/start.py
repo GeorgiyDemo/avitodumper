@@ -1,6 +1,8 @@
 #Кол-во номеров
 #Ссылка
 #Подссылка
+#Длинна номера для фильтрации
+
 import requests, time
 import pytesseract
 from selenium import webdriver
