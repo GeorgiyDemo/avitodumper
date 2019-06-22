@@ -3,7 +3,7 @@ import time
 from bs4 import BeautifulSoup
 from PIL import Image
 from selenium import webdriver
-import writer_module
+import database_module
 import pytesseract
 import base64, re, os
 
@@ -29,7 +29,10 @@ class info_getter(object):
                 buf_usertype = data.getText()
             buf_usertype_list = buf_usertype.split("\n")
             buf_usertype_list = list(filter(None, buf_usertype_list))
-            usertype = buf_usertype_list[len(buf_usertype_list)-2]
+            if "Завершено" in buf_usertype_list[len(buf_usertype_list)-2]:
+                usertype = buf_usertype_list[len(buf_usertype_list)-4]
+            else:
+                usertype = buf_usertype_list[len(buf_usertype_list)-2]
             return usertype
         except:
             return ""
@@ -61,6 +64,11 @@ class info_getter(object):
                 return ""
         return ""
 
+    @staticmethod
+    def get_adtitle(soup_content):
+        for data in soup_content.find_all('span',{'class':'title-info-title-text'}):
+            return data.getText()
+
 class advertisement_parser():
     def __init__(self, url, driver):
         self.url = url
@@ -77,15 +85,15 @@ class advertisement_parser():
             time.sleep(1) #<- Необходимо для прогрузки кода HTML после выполнения JS
             soup = BeautifulSoup(driver.page_source, "lxml")
 
+            #Определяем заголовок объявления
+            adtitle = info_getter.get_adtitle(soup)
             # Определяем имя пользователя
             username = info_getter.get_username(soup)
             #Тип пользоватля (компания/частное лицо/арендодатель и т.д.)
             usertype = info_getter.get_usertype(soup)
             #Номер пользователя
             usernumber = info_getter.get_usernumber(soup)
-            print("Имя: "+username+"\nТип: "+usertype+"\nНомер: "+usernumber)
-
-            #TODO - запись в БД (?)
-            #writer_module.writer_class(number_result)
+            print("\n*"+adtitle+"*\nИмя: "+username+"\nТип: "+usertype+"\nНомер: "+usernumber)
+            database_module.mysql_writer("INSERT INTO datatable (adtitle, number, username, usertype, url) VALUES ('"+adtitle+"','"+usernumber+"','"+username+"','"+usertype+"','"+self.url+"')",1)
         except:
-            print("ЛОЛ, КНОПКИ С НОМЕРОМ ТЕЛЕФОНА НЕТ НА СТРАНИЦЕ")
+            pass

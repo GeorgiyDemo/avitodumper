@@ -30,4 +30,6 @@ class parse_links_class():
 
             page_counter += 1
 
+#driver = webdriver.Chrome()
+#adparser_module.advertisement_parser("https://www.avito.ru/moskva/tovary_dlya_detey_i_igrushki/yoya_plus_4_red_2019_1619927787", driver)
 parse_links_class()
