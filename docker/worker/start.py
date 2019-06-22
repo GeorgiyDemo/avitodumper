@@ -22,7 +22,6 @@ class parse_links_class():
         chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-gpu')
         driver = webdriver.Chrome(chrome_options=chrome_options)
-        driver = webdriver.Chrome()
 
         while page_counter != 5:
             dynamic_url = "/moskva/lichnye_veschi?s_trg=10&p=" + str(page_counter)
