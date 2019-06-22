@@ -1,8 +1,10 @@
 version: '3'
 services:
   worker:
-    build: docker/.
+    build: ./worker/
   db:
     image: mysql:8.0.15
     volumes:
-      - "./dbdata/db:/var/lib/mysql"
+      - "./db/dbdata:/var/lib/mysql"
+    ports:
+      - 3306:3306
