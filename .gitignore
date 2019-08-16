@@ -3,3 +3,4 @@ geckodriver
 *.log
 chromedriver
 *.pyc
+non docker/OUTPUT.txt
