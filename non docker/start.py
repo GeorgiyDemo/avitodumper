@@ -16,7 +16,7 @@ class parse_links_class():
 
     def avito_parse(self):
         page_counter = 4
-        driver = webdriver.Chrome(executable_path="/Users/georgiydemo/Projects/avitodumper/non docker/chromedriver")
+        driver = webdriver.Chrome()
 
         while page_counter != 5:
             dynamic_url = "/moskva/lichnye_veschi?s_trg=10&p=" + str(page_counter)
@@ -26,7 +26,7 @@ class parse_links_class():
                 if "js-item-slider item-slider" in str(link):
                     link_str = str(link)
                     new_link = link_str[link_str.find("<a class=\"js-item-slider item-slider\" href=\"") + len("<a class=\"js-item-slider item-slider\" href=\""):link_str.rfind("\"> <ul class=\"item-slider-list js-item-slider-list\">")]
-                    adparser_module.ADParser(self.base_url + new_link, driver)
+                    adparser_module.advertisement_parser(self.base_url + new_link, driver)
 
             page_counter += 1
 

@@ -7,13 +7,11 @@ import database_module
 import pytesseract
 import base64, re, os
 
-#XPATH кнопки "Показать телефон"
-XPATH_BUTTON_VALUE = "/html/body/div[3]/div[1]/div[3]/div[3]/div[2]/div[1]/div[1]/div/div[2]/div/div/a"
-
-class InfoGetter(object):
+class info_getter(object):
     """
     Класс с логикой парсинга данных из объекта bs
     """
+
     @staticmethod
     def get_username(soup_content):
         try:
@@ -62,6 +60,8 @@ class InfoGetter(object):
             os.remove("image.jpg")
             if len(phone_number) == 11:
                 return phone_number
+            else:
+                return ""
         return ""
 
     @staticmethod
@@ -69,7 +69,7 @@ class InfoGetter(object):
         for data in soup_content.find_all('span',{'class':'title-info-title-text'}):
             return data.getText()
 
-class ADParser():
+class advertisement_parser():
     def __init__(self, url, driver):
         self.url = url
         self.driver = driver
@@ -80,20 +80,20 @@ class ADParser():
         driver = self.driver
         driver.get(self.url)
         try:
-            button = driver.find_element_by_xpath(XPATH_BUTTON_VALUE)
+            button = driver.find_element_by_class_name("item-phone-button-sub-text")
             button.click()
             time.sleep(1) #<- Необходимо для прогрузки кода HTML после выполнения JS
             soup = BeautifulSoup(driver.page_source, "lxml")
 
             #Определяем заголовок объявления
-            adtitle = InfoGetter.get_adtitle(soup)
+            adtitle = info_getter.get_adtitle(soup)
             # Определяем имя пользователя
-            username = InfoGetter.get_username(soup)
+            username = info_getter.get_username(soup)
             #Тип пользоватля (компания/частное лицо/арендодатель и т.д.)
-            usertype = InfoGetter.get_usertype(soup)
+            usertype = info_getter.get_usertype(soup)
             #Номер пользователя
-            usernumber = InfoGetter.get_usernumber(soup)
+            usernumber = info_getter.get_usernumber(soup)
             print("\n*"+adtitle+"*\nИмя: "+username+"\nТип: "+usertype+"\nНомер: "+usernumber)
-            #database_module.mysql_writer("INSERT INTO datatable (adtitle, number, username, usertype, url) VALUES ('"+adtitle+"','"+usernumber+"','"+username+"','"+usertype+"','"+self.url+"')",1)
+            database_module.mysql_writer("INSERT INTO datatable (adtitle, number, username, usertype, url) VALUES ('"+adtitle+"','"+usernumber+"','"+username+"','"+usertype+"','"+self.url+"')",1)
         except:
             pass
