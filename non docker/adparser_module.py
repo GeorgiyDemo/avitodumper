@@ -29,7 +29,7 @@ class InfoGetter(object):
             return ""
 
     @staticmethod
-    def get_usernumber(soup_content):
+    def get_usernumber(soup_content, number_length):
         true_img = ""
         for img in soup_content.find_all("img"):
             if "data:image/png" in str(img):
@@ -49,10 +49,8 @@ class InfoGetter(object):
             phone_number = re.sub('[\-" "]', '', phone_number)
             os.remove(file_name)
             os.remove("image.jpg")
-            if len(phone_number) == 11:
+            if len(phone_number) == number_length:
                 return phone_number
-            else:
-                return ""
         return ""
 
     @staticmethod
@@ -61,7 +59,9 @@ class InfoGetter(object):
             return data.getText()
 
 class advertisement_parser():
-    def __init__(self, url, driver):
+    def __init__(self, url, driver, sd):
+        self.sd = sd
+        self.result = False
         self.url = url
         self.driver = driver
         self.emulator()
@@ -80,8 +80,9 @@ class advertisement_parser():
             # Определяем имя пользователя
             username = InfoGetter.get_username(soup)
             #Номер пользователя
-            usernumber = InfoGetter.get_usernumber(soup)
+            usernumber = InfoGetter.get_usernumber(soup, self.sd["phone_number_length"])
             if username != "" and usernumber != "":
+                self.result = True
                 print("\n*"+adtitle+"*\nИмя: "+username+"\nНомер: "+usernumber)
                 OutWork(usernumber+","+username+";\n")
         except:
