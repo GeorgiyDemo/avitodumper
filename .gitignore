@@ -2,3 +2,4 @@
 chromedriver
 *.pyc
 .idea
+*.DS_Store
