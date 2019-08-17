@@ -7,6 +7,7 @@ RUN apt-get update
 RUN apt-get install -y google-chrome-stable
 
 RUN apt-get install -yqq unzip
+# Версия драйвера 75.0.3770.90, можно изменить тут
 RUN wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/75.0.3770.90/chromedriver_linux64.zip
 RUN unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 

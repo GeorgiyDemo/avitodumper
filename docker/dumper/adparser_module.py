@@ -1,18 +1,13 @@
-
+import base64
+import os
+import re
 import time
-from bs4 import BeautifulSoup
-from PIL import Image
-from selenium import webdriver
+
 import pytesseract
-import base64, re, os
+import util_module
+from PIL import Image
+from bs4 import BeautifulSoup
 
-OUT_FILE = "./out/OUTPUT.txt"
-
-#TODO Очистка файла
-def OutWork(result):
-    f = open(OUT_FILE, 'a')
-    f.write(result)
-    f.close()
 
 class InfoGetter(object):
     """
@@ -22,7 +17,7 @@ class InfoGetter(object):
     @staticmethod
     def get_username(soup_content):
         try:
-            for data in soup_content.find_all('div',{'class':'seller-info-name js-seller-info-name'}):
+            for data in soup_content.find_all('div', {'class': 'seller-info-name js-seller-info-name'}):
                 username = data.getText()
             username = re.sub('[" "\n]', '', username)
             return username
@@ -56,8 +51,9 @@ class InfoGetter(object):
 
     @staticmethod
     def get_adtitle(soup_content):
-        for data in soup_content.find_all('span',{'class':'title-info-title-text'}):
+        for data in soup_content.find_all('span', {'class': 'title-info-title-text'}):
             return data.getText()
+
 
 class advertisement_parser():
     def __init__(self, url, driver, sd):
@@ -70,23 +66,23 @@ class advertisement_parser():
     def emulator(self):
         driver = self.driver
         driver.get(self.url)
-        #TODO Разобраться с тем, почему без этого time.sleep не работает
-        time.sleep(1)
+        #TODO ЧТО-ТО СДЕЛАТЬ
+        time.sleep(2)
         try:
             button = driver.find_element_by_class_name("item-phone-button-sub-text")
             button.click()
-            time.sleep(1) #<- Необходимо для прогрузки кода HTML после выполнения JS
+            time.sleep(1)  # <- Необходимо для прогрузки кода HTML после выполнения JS
             soup = BeautifulSoup(driver.page_source, "lxml")
 
-            #Определяем заголовок объявления
+            # Определяем заголовок объявления
             adtitle = InfoGetter.get_adtitle(soup)
             # Определяем имя пользователя
             username = InfoGetter.get_username(soup)
-            #Номер пользователя
+            # Номер пользователя
             usernumber = InfoGetter.get_usernumber(soup, self.sd["phone_number_length"])
             if username != "" and usernumber != "":
                 self.result = True
-                print("\n*"+adtitle+"*\nИмя: "+username+"\nНомер: "+usernumber)
-                OutWork(usernumber+","+username+";\n")
+                print("\n*" + adtitle + "*\nИмя: " + username + "\nНомер: " + usernumber)
+                util_module.TxtWorker("set", usernumber + "," + username + ";\n")
         except:
             pass

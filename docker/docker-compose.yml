@@ -1,6 +1,6 @@
 version: '3'
 services:
-  worker:
-    build: ./worker/
+  avito_dumper:
+    build: ./dumper/
     volumes:
       - "./out/:/root/out/"
