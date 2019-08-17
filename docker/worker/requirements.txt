@@ -1,6 +1,0 @@
-bs4==0.0.1
-selenium==3.141.0
-pytesseract==0.2.6
-PyMySQL==0.9.3
-requests==2.21.0
-lxml==4.3.3

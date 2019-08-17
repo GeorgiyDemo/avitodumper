@@ -1,22 +1,29 @@
+# В переметрах yaml версия драйвера
 import re
 
 import adparser_module
-import getsettings_module
+import util_module
 from bs4 import BeautifulSoup
 from selenium import webdriver
 
 
 class ParseLinksClass(object):
     def __init__(self):
-        self.settings = getsettings_module.get_settings()
+        sobj = util_module.GetSettings()
+        self.settings = sobj.config
         self.base_url = "https://www.avito.ru"
         self.avito_parse()
 
     def avito_parse(self):
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--window-size=1420,1080')
+        chrome_options.add_argument('--headless')
+        chrome_options.add_argument('--disable-gpu')
+        driver = webdriver.Chrome(chrome_options=chrome_options)
         page_counter = 1
         number_counter = 0
-        driver = webdriver.Chrome(executable_path="/Users/georgiydemo/Projects/avitodumper/non docker/chromedriver")
-
+        util_module.TxtWorker("get", "")
         while number_counter < self.settings["numbers_count"]:
             dynamic_url = self.settings["second_url"] + str(page_counter)
             driver.get(self.base_url + dynamic_url)

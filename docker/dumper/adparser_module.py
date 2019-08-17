@@ -4,16 +4,9 @@ import re
 import time
 
 import pytesseract
+import util_module
 from PIL import Image
 from bs4 import BeautifulSoup
-
-OUT_FILE = "./OUTPUT.txt"
-
-
-def OutWork(result):
-    f = open(OUT_FILE, 'a')
-    f.write(result)
-    f.close()
 
 
 class InfoGetter(object):
@@ -73,6 +66,8 @@ class advertisement_parser():
     def emulator(self):
         driver = self.driver
         driver.get(self.url)
+        #TODO ЧТО-ТО СДЕЛАТЬ
+        time.sleep(2)
         try:
             button = driver.find_element_by_class_name("item-phone-button-sub-text")
             button.click()
@@ -88,6 +83,6 @@ class advertisement_parser():
             if username != "" and usernumber != "":
                 self.result = True
                 print("\n*" + adtitle + "*\nИмя: " + username + "\nНомер: " + usernumber)
-                OutWork(usernumber + "," + username + ";\n")
+                util_module.TxtWorker("set", usernumber + "," + username + ";\n")
         except:
             pass

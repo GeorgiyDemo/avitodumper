@@ -1,10 +1,6 @@
 version: '3'
 services:
-  worker:
-    build: ./worker/
-  db:
-    image: mysql:8.0.15
+  avito_dumper:
+    build: ./dumper/
     volumes:
-      - "./db/dbdata:/var/lib/mysql"
-    ports:
-      - 3306:3306
+      - "./out/:/root/out/"
