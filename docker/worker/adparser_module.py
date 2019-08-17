@@ -3,11 +3,18 @@ import time
 from bs4 import BeautifulSoup
 from PIL import Image
 from selenium import webdriver
-import database_module
 import pytesseract
 import base64, re, os
 
-class info_getter(object):
+OUT_FILE = "./out/OUTPUT.txt"
+
+#TODO Очистка файла
+def OutWork(result):
+    f = open(OUT_FILE, 'a')
+    f.write(result)
+    f.close()
+
+class InfoGetter(object):
     """
     Класс с логикой парсинга данных из объекта bs
     """
@@ -23,22 +30,7 @@ class info_getter(object):
             return ""
 
     @staticmethod
-    def get_usertype(soup_content):
-        try:
-            for data in soup_content.find_all('div',{'class':'seller-info-col'}):
-                buf_usertype = data.getText()
-            buf_usertype_list = buf_usertype.split("\n")
-            buf_usertype_list = list(filter(None, buf_usertype_list))
-            if "Завершено" in buf_usertype_list[len(buf_usertype_list)-2]:
-                usertype = buf_usertype_list[len(buf_usertype_list)-4]
-            else:
-                usertype = buf_usertype_list[len(buf_usertype_list)-2]
-            return usertype
-        except:
-            return ""
-
-    @staticmethod
-    def get_usernumber(soup_content):
+    def get_usernumber(soup_content, number_length):
         true_img = ""
         for img in soup_content.find_all("img"):
             if "data:image/png" in str(img):
@@ -58,10 +50,8 @@ class info_getter(object):
             phone_number = re.sub('[\-" "]', '', phone_number)
             os.remove(file_name)
             os.remove("image.jpg")
-            if len(phone_number) == 11:
+            if len(phone_number) == number_length:
                 return phone_number
-            else:
-                return ""
         return ""
 
     @staticmethod
@@ -70,15 +60,18 @@ class info_getter(object):
             return data.getText()
 
 class advertisement_parser():
-    def __init__(self, url, driver):
+    def __init__(self, url, driver, sd):
+        self.sd = sd
+        self.result = False
         self.url = url
         self.driver = driver
         self.emulator()
 
     def emulator(self):
-        print("Работаем с URL "+self.url)
         driver = self.driver
         driver.get(self.url)
+        #TODO Разобраться с тем, почему без этого time.sleep не работает
+        time.sleep(1)
         try:
             button = driver.find_element_by_class_name("item-phone-button-sub-text")
             button.click()
@@ -86,14 +79,14 @@ class advertisement_parser():
             soup = BeautifulSoup(driver.page_source, "lxml")
 
             #Определяем заголовок объявления
-            adtitle = info_getter.get_adtitle(soup)
+            adtitle = InfoGetter.get_adtitle(soup)
             # Определяем имя пользователя
-            username = info_getter.get_username(soup)
-            #Тип пользоватля (компания/частное лицо/арендодатель и т.д.)
-            usertype = info_getter.get_usertype(soup)
+            username = InfoGetter.get_username(soup)
             #Номер пользователя
-            usernumber = info_getter.get_usernumber(soup)
-            print("\n*"+adtitle+"*\nИмя: "+username+"\nТип: "+usertype+"\nНомер: "+usernumber)
-            database_module.mysql_writer("INSERT INTO datatable (adtitle, number, username, usertype, url) VALUES ('"+adtitle+"','"+usernumber+"','"+username+"','"+usertype+"','"+self.url+"')",1)
+            usernumber = InfoGetter.get_usernumber(soup, self.sd["phone_number_length"])
+            if username != "" and usernumber != "":
+                self.result = True
+                print("\n*"+adtitle+"*\nИмя: "+username+"\nНомер: "+usernumber)
+                OutWork(usernumber+","+username+";\n")
         except:
             pass
