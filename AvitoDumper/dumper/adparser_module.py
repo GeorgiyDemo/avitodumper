@@ -17,9 +17,11 @@ class InfoGetter(object):
     @staticmethod
     def get_username(soup_content):
         try:
-            for data in soup_content.find_all('div', {'class': 'seller-info-name js-seller-info-name'}):
+            for data in soup_content.find_all(
+                "div", {"class": "seller-info-name js-seller-info-name"}
+            ):
                 username = data.getText()
-            username = re.sub('[" "\n]', '', username)
+            username = re.sub('[" "\n]', "", username)
             return username
         except:
             return ""
@@ -31,18 +33,18 @@ class InfoGetter(object):
             if "data:image/png" in str(img):
                 true_img = str(img)
         if true_img != "":
-            new_str = true_img[true_img.find("\"") + len("\""):true_img.rfind("\"")]
-            head, data = new_str.split(',', 1)
-            file_ext = head.split(';')[0].split('/')[1]
+            new_str = true_img[true_img.find('"') + len('"') : true_img.rfind('"')]
+            head, data = new_str.split(",", 1)
+            file_ext = head.split(";")[0].split("/")[1]
             plain_data = base64.b64decode(data)
             file_name = "image." + file_ext
-            with open(file_name, 'wb') as f:
+            with open(file_name, "wb") as f:
                 f.write(plain_data)
             im = Image.open(file_name)
             im = im.convert("RGB")
             im.save("image.jpg")
             phone_number = pytesseract.image_to_string("image.jpg")
-            phone_number = re.sub('[\-" "]', '', phone_number)
+            phone_number = re.sub('[\-" "]', "", phone_number)
             os.remove(file_name)
             os.remove("image.jpg")
             if len(phone_number) == number_length:
@@ -51,11 +53,11 @@ class InfoGetter(object):
 
     @staticmethod
     def get_adtitle(soup_content):
-        for data in soup_content.find_all('span', {'class': 'title-info-title-text'}):
+        for data in soup_content.find_all("span", {"class": "title-info-title-text"}):
             return data.getText()
 
 
-class advertisement_parser():
+class advertisement_parser:
     def __init__(self, url, driver, sd):
         self.sd = sd
         self.result = False
@@ -66,7 +68,7 @@ class advertisement_parser():
     def emulator(self):
         driver = self.driver
         driver.get(self.url)
-        #TODO ЧТО-ТО СДЕЛАТЬ
+        # TODO ЧТО-ТО СДЕЛАТЬ
         time.sleep(2)
         try:
             button = driver.find_element_by_class_name("item-phone-button-sub-text")
@@ -82,7 +84,9 @@ class advertisement_parser():
             usernumber = InfoGetter.get_usernumber(soup, self.sd["phone_number_length"])
             if username != "" and usernumber != "":
                 self.result = True
-                print("\n*" + adtitle + "*\nИмя: " + username + "\nНомер: " + usernumber)
+                print(
+                    "\n*" + adtitle + "*\nИмя: " + username + "\nНомер: " + usernumber
+                )
                 util_module.TxtWorker("set", usernumber + "," + username + ";\n")
         except:
             pass

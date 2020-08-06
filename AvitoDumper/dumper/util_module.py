@@ -12,7 +12,7 @@ class GetSettings(object):
         self.get_settings()
 
     def get_settings(self):
-        with open("./settings.yml", 'r') as stream:
+        with open("./settings.yml", "r") as stream:
             self.config = yaml.safe_load(stream)
 
 
@@ -30,10 +30,10 @@ class TxtWorker(object):
         _selector[flag]()
 
     def get_txtwork(self):
-        f = open(OUT_FILE, 'w')
+        f = open(OUT_FILE, "w")
         f.close()
 
     def set_txtwork(self):
-        f = open(OUT_FILE, 'a')
+        f = open(OUT_FILE, "a")
         f.write(self.result)
         f.close()
