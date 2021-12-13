@@ -2,5 +2,5 @@ bs4==0.0.1
 requests==2.22.0
 selenium==3.141.0
 pytesseract==0.2.9
-lxml==4.6.3
+lxml==4.6.5
 PyYAML==5.4
